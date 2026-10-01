@@ -1,13 +1,11 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 import { STORAGE_KEYS, THEMES } from '../utils/constants';
-import { readStorage, writeStorage } from '../utils/helpers';
 
 export const ThemeContext = createContext(null);
 
+// index.html sets data-theme before first paint; start from that.
 function getInitialTheme() {
-  const saved = readStorage(STORAGE_KEYS.THEME);
-  if (saved === THEMES.LIGHT || saved === THEMES.DARK) return saved;
-  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? THEMES.DARK : THEMES.LIGHT;
+  return document.documentElement.getAttribute('data-theme') === THEMES.DARK ? THEMES.DARK : THEMES.LIGHT;
 }
 
 export function ThemeProvider({ children }) {
@@ -16,7 +14,11 @@ export function ThemeProvider({ children }) {
   // Colors are CSS variables keyed off [data-theme] (see styles/variables.css).
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    writeStorage(STORAGE_KEYS.THEME, theme);
+    try {
+      localStorage.setItem(STORAGE_KEYS.THEME, theme);
+    } catch {
+      // Storage unavailable; theme still applies for this session.
+    }
   }, [theme]);
 
   const toggleTheme = useCallback(

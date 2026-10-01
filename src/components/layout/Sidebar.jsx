@@ -1,49 +1,63 @@
-import { NavLink } from 'react-router-dom';
-import { Circle, LogOut, UserCheck, X } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import config from '../../config/config';
 import { getNavItems } from '../../config/navigation';
 import useAuth from '../../hooks/useAuth';
+import { PATHS, ROLE_LABELS } from '../../utils/constants';
 import { cx } from '../../utils/helpers';
 import { getRoleBasePath } from '../../utils/permissions';
 
 export default function Sidebar({ isOpen, onClose }) {
-  const { role, logout } = useAuth();
+  const { user, role, logout } = useAuth();
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
   const basePath = getRoleBasePath(role);
-  const items = getNavItems(role);
+
+  // Same rule as the original: an item is active when the current URL contains
+  // its path (or one of its `match` fragments).
+  const isActive = ({ path, match = [] }) => [path, ...match].some((part) => pathname.includes(part));
+
+  const handleLogout = async () => {
+    await logout();
+    navigate(PATHS.HOME);
+  };
 
   return (
     <>
       <div className={cx('sidebar-overlay', isOpen && 'is-visible')} onClick={onClose} />
       <aside className={cx('sidebar', isOpen && 'is-open')}>
-        <div className="sidebar-brand">
-          <span className="sidebar-logo">
-            <UserCheck size={20} />
-          </span>
-          <span className="sidebar-brand-name">{config.appName}</span>
-          <button type="button" className="icon-btn sidebar-close" onClick={onClose} aria-label="Close menu">
-            <X size={18} />
-          </button>
+        <div className="sidebar-header">
+          <div className="sidebar-logo">
+            <i className="ph-fill ph-check-circle"></i> {config.appName}
+          </div>
         </div>
 
         <nav className="sidebar-nav">
-          {items.map(({ label, path, icon: Icon = Circle }) => (
-            <NavLink
-              key={path}
-              to={`${basePath}/${path}`}
-              className={({ isActive }) => cx('sidebar-link', isActive && 'is-active')}
+          {getNavItems(role).map((item) => (
+            <Link
+              key={item.path}
+              to={`${basePath}/${item.path}`}
+              className={cx('nav-item', isActive(item) && 'active')}
               onClick={onClose}
             >
-              <Icon size={18} />
-              <span>{label}</span>
-            </NavLink>
+              <i className={`ph ${item.icon}`}></i> {item.label}
+            </Link>
           ))}
         </nav>
 
-        <div className="sidebar-footer">
-          <button type="button" className="sidebar-link" onClick={logout}>
-            <LogOut size={18} />
-            <span>Logout</span>
+        <div className="sidebar-footer sidebar-footer-user">
+          <button type="button" className="nav-item sidebar-logout-btn" onClick={handleLogout}>
+            <i className="ph ph-sign-out"></i> Logout
           </button>
+
+          <Link to={`${basePath}/profile`} className="sidebar-profile-link" onClick={onClose}>
+            <div className="user-profile sidebar-user-profile">
+              <div className="user-avatar sidebar-user-avatar">{user?.emp_name?.charAt(0)}</div>
+              <div className="user-info">
+                <span className="user-name">{user?.emp_name}</span>
+                <span className="user-role">{ROLE_LABELS[role]}</span>
+              </div>
+            </div>
+          </Link>
         </div>
       </aside>
     </>

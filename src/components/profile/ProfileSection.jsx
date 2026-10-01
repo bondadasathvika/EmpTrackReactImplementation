@@ -1,26 +1,32 @@
-import Card from '../common/Card';
-
 /**
- * A titled block of label/value pairs for profile screens
- * (e.g. "Personal Information", "Work Information").
- * fields:   [{ label, value }] — empty values render as "—"
- * actions:  optional node in the section header (e.g. an Edit button)
- * children: optional extra content below the fields (e.g. skills, a form)
+ * A profile info card ("Personal Information", "Work Information"...) in the
+ * original profile-page layout.
+ * fields: [{ label, value, icon? }] — with an icon (Phosphor fill class, e.g.
+ *         'ph-envelope-simple') the row shows icon + label + value; without,
+ *         label above a bold value.
  */
-export default function ProfileSection({ title, subtitle, fields = [], actions, children }) {
+export default function ProfileSection({ title, fields = [], children }) {
   return (
-    <Card title={title} subtitle={subtitle} actions={actions} className="profile-section">
+    <div className="card" style={{ padding: 24 }}>
+      <h3 className="profile-section-title">{title}</h3>
       {fields.length > 0 && (
-        <dl className="profile-fields">
-          {fields.map(({ label, value }) => (
-            <div key={label} className="profile-field">
-              <dt>{label}</dt>
-              <dd>{value || value === 0 ? value : '—'}</dd>
+        <div className="profile-section-list">
+          {fields.map(({ label, value, icon }) => (
+            <div key={label} className={`profile-section-row${icon ? ' has-icon' : ''}`}>
+              {icon && (
+                <div className="profile-section-icon">
+                  <i className={`ph-fill ${icon}`}></i>
+                </div>
+              )}
+              <div>
+                <div className="profile-section-label">{label}</div>
+                <div className="profile-section-value">{value ?? '--'}</div>
+              </div>
             </div>
           ))}
-        </dl>
+        </div>
       )}
       {children}
-    </Card>
+    </div>
   );
 }

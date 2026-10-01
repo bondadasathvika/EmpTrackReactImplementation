@@ -1,10 +1,12 @@
 // Minimal shared app state (no external library).
-// Read in components:  const count = useStore((s) => s.unreadNotificationCount);
-// Update anywhere:     setState({ unreadNotificationCount: 3 });
+// Read in components:  const title = useStore((s) => s.pageTitle);
+// Update anywhere:     setState({ pageTitle: 'Leave Request' });
+// Selectors should return primitives or stable references.
 import { useSyncExternalStore } from 'react';
 
 const initialState = {
-  unreadNotificationCount: 0,
+  // Title shown in the top header; set by pages via usePageTitle().
+  pageTitle: 'Dashboard',
 };
 
 let state = { ...initialState };

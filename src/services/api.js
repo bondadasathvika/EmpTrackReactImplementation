@@ -1,6 +1,10 @@
 // Thin wrapper around native fetch for all backend requests.
 // Usage: api.get('/employees', { params: { status: 'active' } })
 //        api.post('/tasks', { title: '...' })
+//
+// The backend authorizes requests by the `Role`, `x-actor-id` and
+// `x-actor-name` headers (see back-end/src/common/guards/roles.guard.ts),
+// which are filled in from the logged-in user's session.
 import config from '../config/config';
 import { STORAGE_KEYS } from '../utils/constants';
 import { readStorage } from '../utils/helpers';
@@ -23,12 +27,24 @@ function buildUrl(path, params) {
   return query ? `${url}?${query}` : url;
 }
 
+function sessionHeaders() {
+  const session = readStorage(STORAGE_KEYS.AUTH);
+  const user = session?.user;
+  const headers = {};
+  if (user) {
+    headers.Role = user.role;
+    headers['x-actor-id'] = user.emp_id || '';
+    headers['x-actor-name'] = user.emp_name || '';
+  }
+  if (session?.token) headers.Authorization = `Bearer ${session.token}`;
+  return headers;
+}
+
 async function request(method, path, { body, params, headers, signal } = {}) {
   if (!config.apiUrl) {
     throw new ApiError('VITE_API_URL is not configured.', 0);
   }
 
-  const token = readStorage(STORAGE_KEYS.AUTH)?.token;
   const isFormData = body instanceof FormData;
 
   const response = await fetch(buildUrl(path, params), {
@@ -37,7 +53,7 @@ async function request(method, path, { body, params, headers, signal } = {}) {
     headers: {
       Accept: 'application/json',
       ...(body && !isFormData ? { 'Content-Type': 'application/json' } : {}),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...sessionHeaders(),
       ...headers,
     },
     body: body === undefined ? undefined : isFormData ? body : JSON.stringify(body),
@@ -47,8 +63,8 @@ async function request(method, path, { body, params, headers, signal } = {}) {
   const data = contentType.includes('application/json') ? await response.json() : await response.text();
 
   if (!response.ok) {
-    const message = (data && data.message) || response.statusText || 'Request failed';
-    throw new ApiError(message, response.status, data);
+    const message = (data && data.message) || response.statusText || 'API request failed';
+    throw new ApiError(Array.isArray(message) ? message.join(', ') : message, response.status, data);
   }
   return data;
 }

@@ -2,46 +2,42 @@ import { useId } from 'react';
 import { cx } from '../../utils/helpers';
 
 /**
- * Labelled form field. Renders <input> by default;
- * pass as="textarea" or as="select" (with <option> children) for other controls.
+ * Labelled form field using the original .form-group / .form-label / .form-control classes.
+ * Renders <input> by default; pass as="textarea" or as="select" (with <option> children).
+ * groupStyle / style style the wrapper and the control respectively.
  */
 export default function Input({
   label,
   error,
-  hint,
   as: Control = 'input',
   id,
-  required,
   className,
+  groupStyle,
   children,
   ...rest
 }) {
   const generatedId = useId();
   const inputId = id || generatedId;
-  const describedBy = error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined;
 
   return (
-    <div className={cx('form-field', className)}>
+    <div className="form-group" style={groupStyle}>
       {label && (
         <label htmlFor={inputId} className="form-label">
           {label}
-          {required && <span className="form-required">*</span>}
         </label>
       )}
       <Control
         id={inputId}
-        className={cx('form-control', error && 'is-invalid')}
-        required={required}
+        className={cx('form-control', error && 'is-invalid', className)}
         aria-invalid={Boolean(error)}
-        aria-describedby={describedBy}
         {...rest}
       >
         {children}
       </Control>
-      {error ? (
-        <p id={`${inputId}-error`} className="form-error">{error}</p>
-      ) : (
-        hint && <p id={`${inputId}-hint`} className="form-hint">{hint}</p>
+      {error && (
+        <div className="form-error" style={{ display: 'block' }}>
+          {error}
+        </div>
       )}
     </div>
   );

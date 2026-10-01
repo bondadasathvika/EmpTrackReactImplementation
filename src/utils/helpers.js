@@ -36,9 +36,23 @@ export function formatTime(value) {
     : date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 }
 
+/** "Mar 28, 2026, 09:15 AM" (same output as the original sa-common formatDateTime). */
 export function formatDateTime(value) {
-  const date = formatDate(value);
-  return date ? `${date}, ${formatTime(value)}` : '';
+  if (!value) return '-';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  return date.toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+/** Today's date as 'YYYY-MM-DD' in UTC — the format the backend stores attendance dates in. */
+export function todayUtcKey() {
+  return new Date().toISOString().split('T')[0];
 }
 
 /** Local-date key "YYYY-MM-DD" (no timezone shift, unlike toISOString). */

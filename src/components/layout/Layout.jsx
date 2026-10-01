@@ -3,19 +3,22 @@ import { Outlet } from 'react-router-dom';
 import Header from './Header';
 import Sidebar from './Sidebar';
 
-/** Shell for every logged-in page: sidebar + header + routed content. */
+/**
+ * Shell for every logged-in page (same structure as the original pages:
+ * .app-container > sidebar + .main-wrapper > header + .content-area).
+ */
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="app-layout">
+    <div className="app-container">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <div className="app-main">
+      <main className="main-wrapper">
         <Header onMenuClick={() => setSidebarOpen(true)} />
-        <main className="app-content">
+        <div className="content-area" id="main-content">
           <Outlet />
-        </main>
-      </div>
+        </div>
+      </main>
     </div>
   );
 }
