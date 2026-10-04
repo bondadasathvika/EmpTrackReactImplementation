@@ -14,6 +14,7 @@ import EmptyState from '../components/common/EmptyState';
 import Layout from '../components/layout/Layout';
 import employeeRoutes from '../pages/employee/employeeRoutes';
 import Login from '../pages/public/Login';
+import teamLeadRoutes from '../pages/teamlead/teamLeadRoutes';
 import { PATHS, ROLES } from '../utils/constants';
 import { getRoleBasePath } from '../utils/permissions';
 import ProtectedRoute from './ProtectedRoute';
@@ -30,7 +31,7 @@ const roleRoutes = {
   [ROLES.EMPLOYEE]: employeeRoutes,
   [ROLES.HR]: [],
   [ROLES.COMPANY_ADMIN]: [],
-  [ROLES.TEAM_LEAD]: [],
+  [ROLES.TEAM_LEAD]: teamLeadRoutes,
   [ROLES.PLATFORM_ADMIN]: [],
   [ROLES.SUPPORT_MEMBER]: [],
   [ROLES.TECHNICAL_MEMBER]: [],

@@ -99,6 +99,7 @@
 /* Main Content Area */
 .main-wrapper {
     flex: 1;
+    min-width: 0; /* let wide tables scroll inside .table-container instead of widening the page */
     margin-left: var(--sidebar-width);
     display: flex;
     flex-direction: column;
