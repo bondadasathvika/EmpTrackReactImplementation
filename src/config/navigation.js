@@ -30,8 +30,22 @@ const navigation = {
     { label: 'Team Performance', path: 'team-performance', icon: 'ph-users-three' },
     { label: 'Reports', path: 'reports', icon: 'ph-chart-bar' },
   ],
-  [ROLES.PLATFORM_ADMIN]: [],
-  [ROLES.SUPPORT_MEMBER]: [],
+  // Notifications and Profile are reached from the header bell / avatar, as in the original.
+  [ROLES.PLATFORM_ADMIN]: [
+    { label: 'Dashboard', path: 'dashboard', icon: 'ph-squares-four' },
+    { label: 'My Companies', path: 'my-companies', icon: 'ph-buildings' },
+    { label: 'Company Payments', path: 'payments', icon: 'ph-credit-card' },
+    { label: 'Technical Team', path: 'technical-team', icon: 'ph-hard-drives' },
+    { label: 'Support Team', path: 'support-team', icon: 'ph-headset' },
+    { label: 'Technical Issues', path: 'technical-issues', icon: 'ph-bug' },
+    { label: 'Support Tickets', path: 'support-tickets', icon: 'ph-ticket' },
+    { label: 'Workload', path: 'workload', icon: 'ph-gauge' },
+  ],
+  [ROLES.SUPPORT_MEMBER]: [
+    { label: 'Dashboard', path: 'dashboard', icon: 'ph-squares-four' },
+    { label: 'My Tickets', path: 'my-tickets', icon: 'ph-user-focus' },
+    { label: 'Escalated', path: 'escalated', icon: 'ph-arrow-up-right' },
+  ],
   [ROLES.TECHNICAL_MEMBER]: [],
   [ROLES.SUPER_ADMIN]: [],
 };
